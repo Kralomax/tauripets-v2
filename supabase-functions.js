@@ -118,12 +118,17 @@ async function submitScore() {
     }
 
     try {
+        console.log('Collection ID:', collectionId);
+        
         // Check if this exact collection already exists (prevents same account, different character)
         const { data: duplicateCheck } = await supabaseClient
             .from('Leaderboard')
             .select('id, score, player, realm, collection_id')
             .eq('collection_id', collectionId)
             .maybeSingle();
+
+        console.log('Duplicate check result:', duplicateCheck);
+        console.log('Current player:', data.player);
 
         if (duplicateCheck && duplicateCheck.player !== data.player) {
             alert('⚠️ This collection is already on the leaderboard!\n\n' +
