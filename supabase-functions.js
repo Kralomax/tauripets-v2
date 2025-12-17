@@ -146,21 +146,37 @@ async function submitScore() {
             return;
         }
 
-        let result = await supabaseClient
-            .from('Leaderboard')
-            .upsert({
-                player: data.player,
-                realm: data.realm,
-                score: data.score,
-                pets: data.pets,
-                level25: data.level25,
-                rare: data.rare,
-                epic: data.epic,
-                collection_id: collectionId,
-                created_at: new Date()
-            }, {
-                onConflict: 'player'
-            });
+        // If player already exists, update; otherwise insert
+        if (existing) {
+            result = await supabaseClient
+                .from('Leaderboard')
+                .update({
+                    realm: data.realm,
+                    score: data.score,
+                    pets: data.pets,
+                    level25: data.level25,
+                    rare: data.rare,
+                    epic: data.epic,
+                    collection_id: collectionId,
+                    created_at: new Date()
+                })
+                .eq('player', data.player)
+                .eq('realm', data.realm);
+        } else {
+            result = await supabaseClient
+                .from('Leaderboard')
+                .insert({
+                    player: data.player,
+                    realm: data.realm,
+                    score: data.score,
+                    pets: data.pets,
+                    level25: data.level25,
+                    rare: data.rare,
+                    epic: data.epic,
+                    collection_id: collectionId,
+                    created_at: new Date()
+                });
+        }
 
         console.log('Upsert result:', result);
 
