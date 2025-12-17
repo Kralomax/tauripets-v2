@@ -60,6 +60,30 @@ function renderPersonalBest() {
 }
 
 /**
+ * Get achievement badges for a player based on their stats
+ */
+function getAchievementBadges(pets, level25, rare, epic) {
+    const badges = [];
+    
+    // Collection milestones
+    if (pets >= 500) badges.push({ icon: '👑', title: 'Insane Collector (500+ pets)', color: '#a335ee' });
+    else if (pets >= 250) badges.push({ icon: '💎', title: 'Obsessed Collector (250+ pets)', color: '#0070dd' });
+    else if (pets >= 100) badges.push({ icon: '📦', title: 'Dedicated Collector (100+ pets)', color: '#1eff00' });
+    else if (pets >= 50) badges.push({ icon: '🎁', title: 'Collector (50+ pets)', color: '#fff' });
+    
+    // Level 25 achievements
+    if (level25 >= 50) badges.push({ icon: '⭐', title: 'Elite Trainer (50+ level 25)', color: '#ffd700' });
+    else if (level25 >= 25) badges.push({ icon: '🌟', title: 'Pro Trainer (25+ level 25)', color: '#c0c0c0' });
+    else if (level25 >= 10) badges.push({ icon: '✨', title: 'Trainer (10+ level 25)', color: '#cd7f32' });
+    
+    // Quality achievements
+    if (epic >= 10) badges.push({ icon: '💜', title: 'Epic Collector (10+ epic)', color: '#a335ee' });
+    else if (rare >= 25) badges.push({ icon: '💚', title: 'Quality Hunter (25+ rare)', color: '#1eff00' });
+    
+    return badges;
+}
+
+/**
  * Render leaderboard table
  */
 async function renderLeaderboard() {
@@ -88,11 +112,17 @@ async function renderLeaderboard() {
         else if (rank === 3) { trophy = '🥉'; rankClass = 'rank-3'; }
 
         const date = entry.created_at ? new Date(entry.created_at).toLocaleDateString() : 'N/A';
+        
+        // Get achievement badges
+        const badges = getAchievementBadges(entry.pets, entry.level25, entry.rare || 0, entry.epic || 0);
+        const badgesHTML = badges.map(b => 
+            '<span class="achievement-badge" style="color:' + b.color + '" title="' + b.title + '">' + b.icon + '</span>'
+        ).join('');
 
         return '<tr>' +
             '<td class="rank ' + rankClass + '"><span class="trophy">' + trophy + '</span>' + rank + '</td>' +
             '<td class="player-name clickable" onclick="viewPlayerCollection(\'' + entry.player + '\', \'' + entry.realm + '\')">' +
-            entry.player + '-' + entry.realm + '<span class="view-icon">👁️</span></td>' +
+            entry.player + '-' + entry.realm + badgesHTML + '<span class="view-icon">👁️</span></td>' +
             '<td class="score">' + entry.score.toLocaleString() + '</td>' +
             '<td>' + entry.pets + '</td>' +
             '<td>' + entry.level25 + '</td>' +
@@ -313,17 +343,32 @@ function renderAllPets() {
         const isOwned = ownedSpeciesIDs.has(pet.speciesID);
         const sourceClass = 'source-' + pet.source;
         const sourceLabel = sourceLabels[pet.source] || pet.source;
+        
+        // Generate helpful tip for missing pets
+        let howToGet = '';
+        if (!isOwned) {
+            if (pet.source === 'vendor') howToGet = '💰 Can be purchased from a vendor';
+            else if (pet.source === 'wild') howToGet = '🌿 Found in the wild - go catch it!';
+            else if (pet.source === 'drop') howToGet = '⚔️ Drops from enemies';
+            else if (pet.source === 'quest') howToGet = '📜 Reward from a quest';
+            else if (pet.source === 'achievement') howToGet = '🏆 Earned through an achievement';
+            else if (pet.source === 'profession') howToGet = '🔨 Created through a profession';
+            else if (pet.source === 'promotion') howToGet = '🎁 Special promotional pet';
+            else if (pet.source === 'event') howToGet = '🎉 Available during special events';
+            else if (pet.source === 'tcg') howToGet = '🃏 Trading Card Game loot';
+        }
 
         return '<div class="pet-card ' + (isOwned ? 'owned' : 'missing') + '">' +
             '<div class="pet-icon">' + family.icon + '</div>' +
             '<div class="pet-info">' +
             '<div class="pet-name" style="color: ' + (isOwned ? '#00ff88' : '#aaa') + '">' +
-            (isOwned ? '<span class="owned-check">✓</span>' : '') +
+            (isOwned ? '<span class="owned-check">✓</span>' : '<span class="missing-icon">❌</span>') +
             pet.name +
             '<span class="source-badge ' + sourceClass + '">' + sourceLabel + '</span>' +
             '</div>' +
             '<div class="pet-details">' + family.name + (pet.isWild ? ' • Wild Pet' : '') + '</div>' +
             '<div class="pet-location">📍 ' + (pet.sourceText || pet.zone || 'Unknown') + '</div>' +
+            (howToGet ? '<div class="pet-tip">' + howToGet + '</div>' : '') +
             '</div></div>';
     }).join('');
 }
