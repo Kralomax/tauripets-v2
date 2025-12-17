@@ -304,6 +304,21 @@ header::after {
     color: #fff; 
     font-size: 0.9rem; 
 }
+
+/* Zone dropdown special styling */
+.filter-group select {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Make dropdown options wrap text when opened */
+.filter-group select option {
+    white-space: normal;
+    padding: 5px;
+}
+
 .filter-group input:focus, .filter-group select:focus { outline: none; border-color: #00ff88; }
 .filter-group input[type="text"] { min-width: 150px; }
 
