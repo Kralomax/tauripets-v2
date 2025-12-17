@@ -215,7 +215,7 @@ async function submitScore() {
 /**
  * View player collection in modal
  */
-async function viewPlayerCollection(playerName, realmName) {
+async function viewPlayerCollection(playerName, realmName, showAll = false) {
     const modal = document.getElementById('collectionModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
@@ -267,6 +267,10 @@ async function viewPlayerCollection(playerName, realmName) {
             '</div>';
     }
 
+    // Determine how many pets to show
+    const petsToShow = showAll ? pets : pets.slice(0, 50);
+    const hasMore = pets.length > 50 && !showAll;
+
     modalBody.innerHTML =
         '<div class="modal-stats">' +
         '<div class="modal-stat"><div class="value">' + pets.length + '</div><div class="label">Pets</div></div>' +
@@ -277,7 +281,7 @@ async function viewPlayerCollection(playerName, realmName) {
         '</div>' +
         comparisonHTML +
         '<div class="modal-pets">' +
-        pets.slice(0, 50).map(pet => {
+        petsToShow.map(pet => {
             const qc = ['poor', 'common', 'uncommon', 'rare', 'epic', 'legendary'][pet.quality] || 'common';
             const fi = families[pet.petType]?.icon || '❓';
             return '<div class="modal-pet ' + qc + '">' +
@@ -285,8 +289,8 @@ async function viewPlayerCollection(playerName, realmName) {
                 '<span class="pet-name">' + (pet.speciesName || 'Unknown') + '</span>' +
                 '<span class="pet-level">Lv ' + pet.level + '</span></div>';
         }).join('') +
-        (pets.length > 50 ? '<div class="modal-pet more">... and ' + (pets.length - 50) + ' more pets</div>' : '') +
         '</div>' +
+        (hasMore ? '<button class="modal-btn show-more-btn" onclick="viewPlayerCollection(\'' + playerName + '\', \'' + realmName + '\', true)" style="margin-top:15px;">📜 Show All ' + pets.length + ' Pets</button>' : '') +
         '<div class="modal-updated">Last updated: ' + (collection.updated_at ? new Date(collection.updated_at).toLocaleDateString() : 'Unknown') + '</div>';
 }
 
