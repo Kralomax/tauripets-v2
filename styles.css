@@ -305,12 +305,17 @@ header::after {
     font-size: 0.9rem; 
 }
 
-/* Zone dropdown special styling */
+/* Set reasonable widths for filter inputs/selects */
 .filter-group select {
-    max-width: 250px;
+    width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* Zone dropdown can be a bit wider since zone names are long */
+#allZoneFilter, #myZoneFilter {
+    width: 220px;
 }
 
 /* Make dropdown options wrap text when opened */
