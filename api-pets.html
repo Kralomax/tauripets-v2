@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>TauriPets API</title>
+</head>
+<body>
+    <script src="pet-database.js"></script>
+    <script>
+        // Output the pet database as JSON for the addon to fetch
+        const apiResponse = {
+            success: true,
+            version: "1.0",
+            server: "TauriWoW Legion 7.3.5",
+            count: ALL_PETS_DATABASE.length,
+            pets: ALL_PETS_DATABASE
+        };
+        
+        // Output as formatted JSON
+        document.write('<pre>' + JSON.stringify(apiResponse, null, 2) + '</pre>');
+    </script>
+</body>
+</html>
